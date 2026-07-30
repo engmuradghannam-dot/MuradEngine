@@ -226,6 +226,85 @@ def run_test7():
         "elapsed_seconds": round(elapsed, 2)
     }
 
+
+
+@app.post("/run_gpu_cluster_v10")
+def run_gpu_cluster_v10():
+    """Run GPU Cluster v10.0 - Massive Scale Analysis"""
+    from gpu_cluster.gpu_cluster_engine_v10 import GPUClusterEngineV10
+    import time
+    import random
+
+    N = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
+    start_time = time.time()
+
+    cluster = GPUClusterEngineV10(nodes=1_000_000, batch_size=10_000, chunk_size=50)
+
+    ranges = [
+        (0, 2**64),
+        (2**64, 2**128),
+        (2**128, 2**192),
+        (2**192, 2**250),
+        (2**250, N),
+    ]
+
+    cluster.generate_keys_streaming(ranges, max_keys=50_000)
+    cluster.build_index(n_neighbors=50)
+
+    test_k = random.randint(0, 2**64)
+    test_feat = feature_extractor(test_k)
+    test_scaled = cluster.scaler.transform(test_feat.reshape(1, -1))
+    distances, indices = cluster.nn_model.kneighbors(test_scaled, n_neighbors=5)
+
+    elapsed = time.time() - start_time
+    stats = cluster.get_stats()
+
+    return {
+        "status": "completed",
+        "version": "10.0",
+        "nodes": stats["nodes"],
+        "capacity": stats["total_capacity"],
+        "training_samples": stats["keys_generated"],
+        "memory_mb": round(stats["memory_usage_mb"], 2),
+        "test_key_magnitude": test_k.bit_length(),
+        "nearest_neighbors": [
+            {
+                "rank": i+1,
+                "distance": float(distances[0][i]),
+                "range": int(cluster.labels[indices[0][i]]),
+                "magnitude": 0
+            }
+            for i in range(5)
+        ],
+        "elapsed_seconds": round(elapsed, 2)
+    }
+
+@app.get("/gpu_cluster_status")
+def gpu_cluster_status():
+    """Get GPU Cluster status and capabilities"""
+    return {
+        "versions": {
+            "v9.0": {
+                "nodes": 1000,
+                "batch_size": 10000,
+                "capacity": 10000000,
+                "status": "stable"
+            },
+            "v10.0": {
+                "nodes": 1000000,
+                "batch_size": 10000,
+                "capacity": 10000000000,
+                "status": "operational",
+                "features": ["streaming", "memory_optimized", "massive_scale"]
+            }
+        },
+        "endpoints": [
+            "/run_gpu_cluster",
+            "/run_gpu_cluster_v10",
+            "/gpu_cluster_status"
+        ]
+    }
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
