@@ -3,6 +3,14 @@
 # Last Session: Cross-Range + Shuffle + Bit Permutation + Null Control + Magnitude + Leakage Tests
 # IMPORTANT: This file contains NO secrets. Tokens/credentials are stored separately.
 
+## AUTO-CONTINUITY NOTE
+When Murad reconnects, AI will automatically:
+1. Read this file from GitHub
+2. Identify last completed test
+3. Propose next test from TO DO list
+4. Maintain all context across sessions
+5. Write "اكمل من ملف الذاكرة" as self-reminder
+
 ## PROJECT OVERVIEW
 - **Project**: Murad Cosmic Engine v8.2 - Bitcoin Address Scanner
 - **Focus**: Analyzing geometric locality in Bitcoin private key feature space
