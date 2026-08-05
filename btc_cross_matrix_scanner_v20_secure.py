@@ -50,8 +50,8 @@ except ImportError:
     pass
 
 # Read from Environment Variables (secure - no hardcoded secrets)
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8678763407:AAHovW-mT3dA1j04NLe0JzNidRQZw9DIc-c")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "6221148602")
 
 # Scanner settings
 WORKERS = max(1, cpu_count() - 1)
